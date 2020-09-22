@@ -12,6 +12,7 @@ type
     function GetLocalFileSize(const AFileName: string): Integer;
   published
     procedure TestParse;
+    procedure Test2;
   end;
 
 implementation
@@ -27,6 +28,25 @@ begin
   Assert(h <> INVALID_HANDLE_VALUE, 'File not found');
   Result := GetFileSize(h, nil);
   CloseHandle(h);
+end;
+
+procedure TTnefReaderTest.Test2;
+var
+  stream: TStream;
+  parser: TTnefAttachmentParser;
+begin
+  stream := nil;
+  parser := nil;
+  try
+    stream := TFileStream.Create('d:\60\winmail.dat', fmOpenRead or fmShareDenyWrite);
+
+    parser := TTnefAttachmentParser.Create();
+
+    parser.Parse(stream, 'd:\60\tnef\');
+  finally
+    parser.Free();
+    stream.Free();
+  end;
 end;
 
 procedure TTnefReaderTest.TestParse;

@@ -65,6 +65,7 @@ begin
   FValueLength := 0;
   FPropertyValueStart := 0;
   FPropertyTag := nil;
+  FPropertyName := nil;
 end;
 
 function TTnefPropertyReader.DecodeAnsiString(const ABytes: TBytes): string;
@@ -117,6 +118,7 @@ end;
 
 destructor TTnefPropertyReader.Destroy;
 begin
+  FPropertyName.Free();
   FPropertyTag.Free();
   inherited Destroy();
 end;
@@ -290,6 +292,8 @@ var
   bytes: TBytes;
   name: string;
 begin
+  FreeAndNil(FPropertyName);
+
   if (not PropertyTag.IsNamed) then Exit;
 
   guid := TGUID.Create(FReader.ReadBytes(16));
@@ -317,11 +321,10 @@ end;
 
 procedure TTnefPropertyReader.ReadPropertyTag;
 var
-  propertyType: TTnefPropertyType;
-  propertyId: TTnefPropertyId;
+  propertyType, propertyId: Integer;
 begin
-  propertyType := GetTnefPropertyType(FReader.ReadInt16());
-  propertyId := GetTnefPropertyId(FReader.ReadInt16());
+  propertyType := FReader.ReadInt16();
+  propertyId := FReader.ReadInt16();
 
   FreeAndNil(FPropertyTag);
   FPropertyTag := TTnefPropertyTag.Create(propertyType, propertyId);

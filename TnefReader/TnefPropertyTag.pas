@@ -10,28 +10,31 @@ type
   private
     FId: TTnefPropertyId;
     FPropertyType: TTnefPropertyType;
+    FRawId: SmallInt;
 
     function GetIsMultiValued: Boolean;
     function GetIsNamed: Boolean;
   public
-    constructor Create(APropertyType: TTnefPropertyType; AId: TTnefPropertyId);
+    constructor Create(APropertyType, AId: SmallInt);
 
     property IsNamed: Boolean read GetIsNamed;
     property IsMultiValued: Boolean read GetIsMultiValued;
     property PropertyType: TTnefPropertyType read FPropertyType;
     property Id: TTnefPropertyId read FId;
+    property RawId: SmallInt read FRawId;
   end;
 
 implementation
 
 { TTnefPropertyTag }
 
-constructor TTnefPropertyTag.Create(APropertyType: TTnefPropertyType; AId: TTnefPropertyId);
+constructor TTnefPropertyTag.Create(APropertyType, AId: SmallInt);
 begin
   inherited Create();
 
-  FPropertyType := APropertyType;
-  FId := AId;
+  FPropertyType := GetTnefPropertyType(APropertyType);
+  FId := GetTnefPropertyId(AId);
+  FRawId := AId;
 end;
 
 function TTnefPropertyTag.GetIsMultiValued: Boolean;
@@ -41,12 +44,12 @@ end;
 
 function TTnefPropertyTag.GetIsNamed: Boolean;
 const
-  NamedMinId: Integer = $8000;
-  NamedMaxId: Integer = $FFFE;
+  NamedMinId: SmallInt = SmallInt($8000);
+  NamedMaxId: SmallInt = SmallInt($FFFE);
 var
   propId: Integer;
 begin
-  propId := Integer(TnefPropertyIds[Id]);
+  propId := Integer(RawId);
   Result := (propId >= NamedMinId) and (propId <= NamedMaxId);
 end;
 
